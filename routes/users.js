@@ -4,7 +4,7 @@ const router = express.Router();
 
 const users = [
   {
-    name: "Samuel",
+    name: "Marco",
     lastName: "Lopes",
     id: "1",
   },
@@ -14,7 +14,7 @@ const users = [
     id: "2",
   },
   {
-    name: "Samuel",
+    name: "Isabele",
     lastName: "Lopes",
     id: "3",
   },

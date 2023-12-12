@@ -1,9 +1,7 @@
 import express from "express";
-
+import { validarAutenticacao } from "../middlewares/validarAutenticacao.js";
+import { validarPermissao, validarPermissaoVendedor } from "../middlewares/validarPermissao.js";
 const router = express.Router();
-
-const permissao = "vendedor";
-const autenticacao = true;
 
 /**
  * Validar todos os endpoints se estão logados e com a permissao vendedor
@@ -42,10 +40,7 @@ const produtos = [
   },
 ];
 
-router.get("/produtos", (req, res) => {
-  if (!autenticacao) {
-    return res.status(401).json({ message: "Usuário não autenticado" });
-  }
+router.get("/produtos", validarAutenticacao, validarPermissaoVendedor, (req, res) => {
 
   res.status(200).json({
     data: produtos,
@@ -57,10 +52,7 @@ router.get("/produtos", (req, res) => {
   });
 });
 
-router.get("/produto/:id", (req, res) => {
-  if (!autenticacao) {
-    return res.status(401).json({ message: "Usuário não autenticado" });
-  }
+router.get("/produto/:id", validarAutenticacao, validarPermissaoVendedor, (req, res) => {
 
   const produto = produtos.find((produto) => produto.id === req.params.id);
   res.status(200).json({
@@ -69,14 +61,8 @@ router.get("/produto/:id", (req, res) => {
   });
 });
 
-router.get("/produtos/total-estoque", (req, res) => {
-  if (!autenticacao) {
-    return res.status(401).json({ message: "Usuário não autenticado" });
-  }
+router.get("/produtos/total-estoque", validarAutenticacao, validarPermissaoVendedor, (req, res) => {
 
-  if (permissao !== "vendedor") {
-    return res.status(403).json({ message: "Usuário não possui autenticação suficiente" })
-  }
   const estoqueProdutos = produtos.map((produto) => {
     return {
       [produto.nome]: produto.quantidade * produto.valorUnit,
@@ -85,38 +71,20 @@ router.get("/produtos/total-estoque", (req, res) => {
   res.status(200).json(estoqueProdutos);
 });
 
-router.post("/produto", (req, res) => {
-  if (!autenticacao) {
-    return res.status(401).json({ message: "Usuário não autenticado" });
-  }
+router.post("/produto", validarAutenticacao, validarPermissaoVendedor, (req, res) => {
 
-  if (permissao !== "vendedor") {
-    return res.status(403).json({ message: "Usuário não possui autenticação suficiente" })
-  }
   produtos.push(req.body);
   res.status(201).json(produtos);
 });
 
-router.delete("/produto/:id", (req, res) => {
-  if (!autenticacao) {
-    return res.status(401).json({ message: "Usuário não autenticado" });
-  }
+router.delete("/produto/:id", validarAutenticacao, validarPermissaoVendedor, (req, res) => {
 
-  if (permissao !== "vendedor") {
-    return res.status(403).json({ message: "Usuário não possui autenticação suficiente" })
-  }
   const prodDeletado = produtos.splice(req.params.id - 1, 1);
   res.status(200).json(prodDeletado);
 });
 
-router.patch("/produto/:id", (req, res) => {
-  if (!autenticacao) {
-    return res.status(401).json({ message: "Usuário não autenticado" });
-  }
+router.patch("/produto/:id", validarAutenticacao, validarPermissaoVendedor, (req, res) => {
 
-  if (permissao !== "vendedor") {
-    return res.status(403).json({ message: "Usuário não possui autenticação suficiente" })
-  }
   const index = req.params.id - 1;
   produtos.splice(index, 1, {
     ...produtos[index],

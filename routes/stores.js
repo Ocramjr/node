@@ -1,13 +1,12 @@
 import express from "express";
-
+import { validarAutenticacao } from "../middlewares/validarAutenticacao.js";
+import { validarPermissao } from "../middlewares/validarPermissao.js";
 const router = express.Router();
-const permissao = "admin";
-const autenticacao = true;
+
 
 /**
  * Validar todos os endpoints se estão logados e com a permissao de admin
  */
-
 
 const lojas = [
   {
@@ -37,24 +36,11 @@ const lojas = [
   },
 ];
 
-router.get("/lojas", (req, res) => {
-  if (!autenticacao) {
-    return res.status(401).json({ message: "Usuário não autenticado" });
-  }
-
-  if (permissao !== "admin") {
-    return res.status(403).json({ message: "Usuário não possui autenticação suficiente" })
-  }
+router.get("/lojas", validarAutenticacao, validarPermissao, (req, res) => {
   return res.status(200).json(lojas);
 });
 
-router.get("/loja/:id", (req, res) => {
-  if (!autenticacao) {
-    return res.status(401).json({ message: "Usuário não autenticado" });
-  }
-  if (permissao !== "admin") {
-    return res.status(403).json({ message: "Usuário não possui autenticação suficiente" })
-  }
+router.get("/loja/:id", validarAutenticacao, validarPermissao, (req, res) => {
 
   const loja = lojas.find((loja) => loja.id === req.params.id)
 
@@ -65,14 +51,7 @@ router.get("/loja/:id", (req, res) => {
   return res.status(200).json(loja);
 });
 
-router.get("/lojas/faturamento", (req, res) => {
-  if (!autenticacao) {
-    return res.status(401).json({ message: "Usuário não autenticado" });
-  }
-
-  if (permissao !== "admin") {
-    return res.status(403).json({ message: "Usuário não possui autenticação suficiente" })
-  } 
+router.get("/lojas/faturamento", validarAutenticacao, validarPermissao, (req, res) => {
 
   if(lojas.length < 1) {
     return res.status(200).json({ message: "Não há lojas cadastradas!" })
@@ -87,15 +66,8 @@ router.get("/lojas/faturamento", (req, res) => {
   return res.status(200).json(faturamentoPorLojas);
 });
 
-router.post("/loja", (req, res) => {
+router.post("/loja", validarAutenticacao, validarPermissao, (req, res) => {
   const loja = lojas.find((loja) => loja.id === req.body.id)
-  if (!autenticacao) {
-    return res.status(401).json({ message: "Usuário não autenticado" });
-  }
-
-  if (permissao !== "admin") {
-    return res.status(403).json({ message: "Usuário não possui autenticação suficiente" })
-  }
 
   if (!req.body.id) {
     return res.status(400).json({ mensagem: "Id não identificado!" });
@@ -127,14 +99,7 @@ router.post("/loja", (req, res) => {
   return res.status(201).json(lojas);
 });
 
-router.delete("/loja/:id", (req, res) => {
-  if (!autenticacao) {
-    return res.status(401).json({ message: "Usuário não autenticado" });
-  }
-
-  if (permissao !== "admin") {
-    return res.status(403).json({ message: "Usuário não possui autenticação suficiente" })
-  }
+router.delete("/loja/:id",validarAutenticacao, validarPermissao, (req, res) => {
 
   const idLoja = lojas.find((loja) => loja.id === req.params.id)
 
@@ -146,14 +111,7 @@ router.delete("/loja/:id", (req, res) => {
   return res.status(200).json(storeDeletado[0].id);  
 });
 
-router.patch("/loja/:id", (req, res) => {
-  if (!autenticacao) {
-    return res.status(401).json({ message: "Usuário não autenticado" });
-  }
-
-  if (permissao !== "admin") {
-    return res.status(403).json({ message: "Usuário não possui autenticação suficiente" })
-  }
+router.patch("/loja/:id", validarAutenticacao, validarPermissao, (req, res) => {
 
   const idLoja = lojas.find((loja) => loja.id === req.params.id)
 
